@@ -1,0 +1,20 @@
+FINANCIAL FRAUD DETECTION - MODEL EVALUATION
+Test Records: 1000
+Actual Fraud Cases: 96
+Predicted Fraud Cases: 268
+ROC-AUC: 0.8778
+PR-AUC: 0.4176
+
+Classification Report:
+              precision    recall  f1-score   support
+
+  Legitimate       0.97      0.79      0.87       904
+  Fraudulent       0.28      0.77      0.41        96
+
+    accuracy                           0.78      1000
+   macro avg       0.62      0.78      0.64      1000
+weighted avg       0.90      0.78      0.82      1000
+
+Confusion Matrix:
+[[710 194]
+ [ 22  74]]
