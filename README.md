@@ -1,9 +1,7 @@
 # Financial Fraud Detection System
 
 ## Project Overview
-The Financial Fraud Detection System is a Machine Learning-based application designed to identify potentially fraudulent financial transactions.
-
-It analyzes transaction details and predicts the probability of fraud using trained machine learning models.
+A Machine Learning-based application designed to identify potentially fraudulent financial transactions using transaction data.
 
 ## Features
 - Dataset Overview and Analysis
@@ -24,7 +22,7 @@ It analyzes transaction details and predicts the probability of fraud using trai
 - Decision Tree
 - Random Forest
 
-The preliminary selected model is Logistic Regression based on PR-AUC.
+Preliminary selected model: Logistic Regression based on PR-AUC.
 
 ## Technologies Used
 - Python
@@ -35,20 +33,12 @@ The preliminary selected model is Logistic Regression based on PR-AUC.
 - Streamlit
 - Joblib
 
-## How to Run Locally
-
-1. Clone the repository.
-2. Install the required packages:
+## Run Locally
 
 ```bash
 pip install -r requirements.txt
-```
-
-3. Run the application:
-
-```bash
 streamlit run app.py
 ```
 
 ## Project Status
-The interactive dashboard and initial model evaluation are completed. Further validation is required before production use.
+Interactive dashboard and initial model evaluation completed. Further validation is required before production use.
