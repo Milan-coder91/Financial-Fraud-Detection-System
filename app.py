@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -27,8 +26,8 @@ except ImportError:
 # =========================================================
 
 st.set_page_config(
-    page_title="FraudShield AI | Financial Intelligence",
-    page_icon="🛡️",
+    page_title="Financial Fraud Detection Dashboard",
+    page_icon="💳",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -51,7 +50,6 @@ TARGET = "Fraudulent"
 st.markdown("""
 <style>
 
-/* Main Theme */
 :root {
     --brown: #50382c;
     --brown2: #79543f;
@@ -86,25 +84,32 @@ st.markdown("""
     color: #fff8ed !important;
 }
 
-/* Remove red selection/highlight */
+/* Sidebar navigation */
+[data-testid="stSidebar"] [role="radiogroup"] {
+    gap: 7px;
+}
+
 [data-testid="stSidebar"] [role="radiogroup"] label {
     background: transparent !important;
     border-radius: 8px;
     padding: 7px 9px;
+    transition: all 0.2s ease;
 }
 
 [data-testid="stSidebar"] [role="radiogroup"] label:hover {
-    background: rgba(255,255,255,0.12) !important;
+    background: rgba(255,255,255,0.15) !important;
 }
 
+/* Remove radio indicator */
 [data-testid="stSidebar"] [role="radio"] > div:first-child {
-    border-color: #e9c8a9 !important;
+    display: none !important;
 }
 
-[data-testid="stSidebar"] [role="radio"][aria-checked="true"] > div:first-child {
-    border-color: #e9c8a9 !important;
-    background: #79543f !important;
-    box-shadow: none !important;
+/* Selected navigation item */
+[data-testid="stSidebar"] [role="radio"][aria-checked="true"] {
+    background: #a16b4e !important;
+    border-radius: 8px;
+    font-weight: 700;
 }
 
 /* Checkbox */
@@ -525,7 +530,7 @@ def make_pdf_report(frame):
             styles["ReportTitle"]
         ),
         Paragraph(
-            "Dataset Analytics and Fraud Investigation Report",
+            "Amdox Technologies Internship Project",
             styles["Normal"]
         ),
         Spacer(1, 7 * mm)
@@ -646,12 +651,12 @@ def filtered_frame():
 
 
 # =========================================================
-# 7. SIDEBAR NAVIGATION WITH ICONS
+# 7. SIDEBAR NAVIGATION
 # =========================================================
 
-st.sidebar.markdown("# 🛡️ FraudShield AI")
+st.sidebar.markdown("# 💳 Financial Fraud Dashboard")
 
-st.sidebar.caption("FINANCIAL FRAUD INTELLIGENCE")
+st.sidebar.caption("AMDOX TECHNOLOGIES | INTERNSHIP PROJECT")
 
 st.sidebar.divider()
 
@@ -699,7 +704,7 @@ st.sidebar.caption(
 
 st.sidebar.divider()
 
-st.sidebar.caption("FraudShield AI | Analytics Platform")
+st.sidebar.caption("Financial Fraud Detection | Analytics Platform")
 
 
 # =========================================================
@@ -710,9 +715,9 @@ if page == "Executive Dashboard":
 
     st.markdown("""
     <div class="hero">
-        <h1>🛡️ Financial Fraud Detection Dashboard</h1>
+        <h1>💳 Financial Fraud Detection Dashboard</h1>
         <p>Enterprise Transaction Monitoring • Fraud Analytics • Risk Intelligence</p>
-        <p>Machine Learning | Transaction Analysis | Fraud Investigation</p>
+        <p>Amdox Technologies Internship Project</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1813,7 +1818,6 @@ elif page == "EDA Dashboard":
 
     if numeric.shape[1] > 1:
 
-        # Sample large datasets to avoid excessive memory use.
         corr_data = numeric.sample(
             min(len(numeric), 50000),
             random_state=42
@@ -2540,7 +2544,7 @@ elif page == "Downloads & Reports":
 elif page == "AI Chat Assistant":
 
     page_header(
-        "💬 FraudShield AI Chat Assistant",
+        "💬 Dashboard Chat Assistant",
         "Ask questions about your selected fraud dataset"
     )
 
@@ -2552,9 +2556,9 @@ elif page == "AI Chat Assistant":
 
     kpi_row(filtered)
 
-    if "fraudshield_chat_history" not in st.session_state:
+    if "dashboard_chat_history" not in st.session_state:
 
-        st.session_state.fraudshield_chat_history = []
+        st.session_state.dashboard_chat_history = []
 
     def chatbot_answer(question, data):
 
@@ -2680,7 +2684,7 @@ elif page == "AI Chat Assistant":
             "Try: 'Show fraud rate' or 'How many fraud cases?'"
         )
 
-    for message in st.session_state.fraudshield_chat_history:
+    for message in st.session_state.dashboard_chat_history:
 
         with st.chat_message(message["role"]):
 
@@ -2692,7 +2696,7 @@ elif page == "AI Chat Assistant":
 
     if question:
 
-        st.session_state.fraudshield_chat_history.append({
+        st.session_state.dashboard_chat_history.append({
             "role": "user",
             "content": question
         })
@@ -2702,7 +2706,7 @@ elif page == "AI Chat Assistant":
             filtered
         )
 
-        st.session_state.fraudshield_chat_history.append({
+        st.session_state.dashboard_chat_history.append({
             "role": "assistant",
             "content": answer
         })
@@ -2711,7 +2715,7 @@ elif page == "AI Chat Assistant":
 
     if st.button("🗑️ Clear Chat"):
 
-        st.session_state.fraudshield_chat_history = []
+        st.session_state.dashboard_chat_history = []
 
         st.rerun()
 
@@ -2753,9 +2757,9 @@ st.markdown(
         font-size:12px;
         padding:10px;
     ">
-        🛡️ <b>FraudShield AI</b> |
-        Financial Fraud Detection System |
-        Machine Learning & Analytics Dashboard
+        💳 <b>Financial Fraud Detection Dashboard</b> |
+        Amdox Technologies Internship Project |
+        Machine Learning & Analytics
     </div>
     """,
     unsafe_allow_html=True
