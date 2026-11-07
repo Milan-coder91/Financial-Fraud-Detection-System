@@ -26,7 +26,7 @@ except ImportError:
 # =========================================================
 
 st.set_page_config(
-    page_title="Financial Fraud Detection Dashboard",
+    page_title="Financial Fraud Detection ",
     page_icon="💳",
     layout="wide",
     initial_sidebar_state="expanded"
