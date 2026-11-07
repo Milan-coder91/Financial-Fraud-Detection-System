@@ -1,160 +1,96 @@
-        Paragraph(
-            "Note: This report summarizes dataset records. "
-            "A fraud flag is not a confirmed fraud finding.",
-            styles["BodyText"]
-        )
-    ])
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+import joblib
+from pathlib import Path
+from io import BytesIO
+from datetime import datetime
 
-    doc.build(story)
-    buffer.seek(0)
-
-    return buffer.getvalue()
-
-
-def filtered_frame():
-
-    result = df.copy()
-
-    if DATE_COL and result["_parsed_date"].notna().any():
-
-        min_d = result["_parsed_date"].min().date()
-        max_d = result["_parsed_date"].max().date()
-
-        selected = st.sidebar.date_input(
-            "📅 Transaction Date Range",
-            value=(min_d, max_d),
-            min_value=min_d,
-            max_value=max_d,
-            key="date_filter"
-        )
-
-        if isinstance(selected, (tuple, list)) and len(selected) == 2:
-
-            start, end = selected
-
-            result = result[
-                result["_parsed_date"].dt.date.between(
-                    start,
-                    end
-                )
-            ]
-
-    if "Location" in result.columns:
-
-        locations = sorted(
-            result["Location"].dropna().astype(str).unique()
-        )
-
-        chosen = st.sidebar.multiselect(
-            "📍 Location",
-            locations,
-            key="location_filter"
-        )
-
-        if chosen:
-            result = result[
-                result["Location"].astype(str).isin(chosen)
-            ]
-
-    if "Merchant_Category" in result.columns:
-
-        merchants = sorted(
-            result["Merchant_Category"].dropna().astype(str).unique()
-        )
-
-        chosen_m = st.sidebar.multiselect(
-            "🏪 Merchant Category",
-            merchants,
-            key="merchant_filter"
-        )
-
-        if chosen_m:
-            result = result[
-                result["Merchant_Category"].astype(str).isin(chosen_m)
-            ]
-
-    return result
+try:
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import mm
+    from reportlab.platypus import (
+        SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    )
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
 
 
 # =========================================================
-# 7. SIDEBAR NAVIGATION
+# 1. PAGE CONFIGURATION
 # =========================================================
 
-st.sidebar.markdown("""
-<div class="sidebar-brand">
-    <h3>💳 Financial Fraud</h3>
-    <p>AMDOX TECHNOLOGIES | INTERNSHIP PROJECT</p>
-</div>
-""", unsafe_allow_html=True)
-
-st.sidebar.divider()
-
-pages = {
-    "🏠 Executive Dashboard": "Executive Dashboard",
-    "📊 Overview": "Overview",
-    "📈 Trend Analysis": "Trend Analysis",
-    "📍 Location Fraud": "Location Fraud",
-    "💰 Transaction Amount": "Transaction Amount",
-    "🏪 Merchant Analysis": "Merchant Analysis",
-    "💳 Transaction Type": "Transaction Type",
-    "⏰ Time Based Fraud": "Time Based Fraud",
-    "🔎 Detailed Investigation": "Detailed Investigation",
-    "🤖 Fraud Prediction": "Fraud Prediction",
-    "📁 Dataset Overview": "Dataset Overview",
-    "📉 EDA Dashboard": "EDA Dashboard",
-    "⚙️ Feature Engineering": "Feature Engineering",
-    "🕵️ Fraud Intelligence": "Fraud Intelligence",
-    "🏆 Model Comparison": "Model Comparison",
-    "🧠 Explainable AI": "Explainable AI",
-    "📡 Real-Time Monitoring": "Real-Time Monitoring",
-    "🔮 Fraud Forecasting": "Fraud Forecasting",
-    "🔗 Graph Analytics": "Graph Analytics",
-    "📤 Downloads & Reports": "Downloads & Reports",
-    "💬 AI Chat Assistant": "AI Chat Assistant"
-}
-
-selected_page = st.sidebar.radio(
-    "NAVIGATION",
-    list(pages.keys()),
-    index=0,
-    label_visibility="collapsed"
+st.set_page_config(
+    page_title="Financial Fraud Detection & Risk Analytics",
+    page_icon="💳",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-page = pages[selected_page]
+BASE_DIR = Path(__file__).resolve().parent
 
-st.sidebar.divider()
+DATA_PATH = BASE_DIR / "fraud_detection_dataset.csv"
+PROCESSED_PATH = BASE_DIR / "processed_fraud_dataset.csv"
+MODEL_PATH = BASE_DIR / "fraud_detection_model.joblib"
+COMPARISON_PATH = BASE_DIR / "model_comparison.csv"
+METRICS_PATH = BASE_DIR / "model_metrics.json"
 
-st.sidebar.markdown("### 🔎 Fraud Filters")
-
-filtered = filtered_frame()
-
-st.sidebar.caption(
-    f"Showing {len(filtered):,} of {total:,} transactions"
-)
-
-st.sidebar.divider()
-
-st.sidebar.caption("Financial Fraud Detection & Risk Analytics")
+TARGET = "Fraudulent"
 
 
 # =========================================================
-# GLOBAL APPLICATION HEADER
+# 2. PROFESSIONAL UI THEME
 # =========================================================
 
 st.markdown("""
-<div class="top-brand">
-    <h1>💳 Financial Fraud Detection &amp; Risk Analytics</h1>
-    <p>AMDOX TECHNOLOGIES | INTERNSHIP PROJECT</p>
-</div>
-""", unsafe_allow_html=True)
-
-
-# =========================================================
-# 8. EXECUTIVE DASHBOARD
-# =========================================================
-
-if page == "Executive Dashboard":
-
-    st.subheader("📊 Executive Overview")
-
-    kpi_row(filtered)
+<style>
+:root {
+    --bg: #111315;
+    --panel: #1b1e22;
+    --sidebar: #17191c;
+    --card: #202429;
+    --accent: #4f8cff;
+    --accent2: #2f6fdb;
+    --text: #f3f5f7;
+    --muted: #aab2bd;
+    --line: #343a42;
+    --danger: #ef5350;
+    --success: #35b779;
+}
+.stApp {
+    background: var(--bg);
+    color: var(--text);
+}
+[data-testid="stHeader"] {
+    background: rgba(17,19,21,0.96);
+}
+[data-testid="stToolbar"] { right: 1rem; }
+.block-container {
+    padding-top: 1.8rem;
+    padding-bottom: 2.5rem;
+    max-width: 1600px;
+}
+[data-testid="stSidebar"] {
+    background: var(--sidebar);
+    border-right: 1px solid var(--line);
+}
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 1.3rem;
+}
+[data-testid="stSidebar"] * {
+    color: var(--text);
+}
+[data-testid="stSidebar"] [role="radiogroup"] {
+    gap: 5px;
+}
+[data-testid="stSidebar"] [role="radiogroup"] label {
+    background: transparent !important;
+    border-radius: 9px;
+    padding: 8px 10px;
+    transition: all .18s ease;
+}
